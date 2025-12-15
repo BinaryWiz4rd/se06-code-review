@@ -1,0 +1,39 @@
+def calcMed(w, AGE, code, urgent=False):
+    """
+    Calculates medication dose based on weight.
+
+    PARAMS:
+        weight_kg: float - patient body mass in kg
+        age: years
+        drug_name (str) name of drug: "amox", "ibup", etc.
+        emergency - optional flag for EMERGENCY USE ONLY dose
+    Returns: dose in mg
+
+    Notes:
+    - THIS FUNCTION DOES NOT CHECK FOR ALLERGIES!!!
+    - Based on hospital guidelines 2021 (TODO: update to 2025)
+    - If weight is negative it returns None (!!!)
+    """
+
+    if w <= 0:
+        raise ValueError("weight_kg must be positive")
+
+    if AGE < 0:
+        raise ValueError("age_years cannot be negative")
+
+    dpk = {
+        "DRUG_A": 2.0,   # fictional mg/kg
+        "DRUG_B": 0.5,   # fictional mg/kg
+        "DRUG_C": 1.2    # fictional mg/kg
+    }
+
+    if code not in dpk:
+        raise ValueError(f"Unknown drug_code: {code}")
+
+    bd = w * dpk[code]
+
+
+    if AGE < 12:
+        bd *= 0.8
+
+    return round(bd, 2)

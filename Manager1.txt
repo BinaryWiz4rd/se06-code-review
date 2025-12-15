@@ -1,0 +1,80 @@
+// The Manager1 class implements the following requirements:
+// 1/ The system should validate the patient's age using defined limits and stop processing if the age is outside of the valid range. 
+// 2/ The system should classify the patient's blood pressure (BP) reading as high risk (systolic BP > 150 and diastolic BP > 95), medium risk (systolic BP > 130), or normal. 
+// 3/ The system should output the result for further processing.
+
+
+import java.io.FileWriter;
+import java.io.*;
+import java.util.*;
+
+public class Manager1 {
+
+    private static List<String> logs = new ArrayList<>();
+
+    private static final int MIN_AGE = 0;
+    private static final int MAX_AGE = 130;
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/hospital";
+    private static final String REPORT_FILE = "report.txt";
+
+
+    public void process(Patient1 p) {
+
+        if (p.a < MIN_AGE || p.a > MAX_AGE) {
+            System.out.println("Invalid age!");
+            logs.add("Invalid patient: " + p.n);
+            return;
+        }
+
+        if (p.a < MIN_AGE) {
+            System.out.println("Patient is a minor.");
+        } else {
+            System.out.println("Patient is an adult.");
+        }
+
+        logs.add("Processed patient " + p.n);
+
+    }
+
+    public int process2(
+            Patient1 p,
+            int bpSys,
+            int bpDia,
+            boolean printResult
+    ) {
+        int result = 0;
+
+        if (p.a < 0 || p.a > 150) {
+            logs.add("Invalid patient age: " + p.a);
+            return -1;
+        }
+
+        if (bpSys > 150 || bpDia > 95) {
+            result = 2;
+        } else if (bpSys > 130) {
+            result = 1;
+        } else {
+            result = 0;
+        }
+
+        if (printResult) {
+            System.out.println("Patient " + p.n + ": score=" + result);
+        }
+
+        return result;
+    }
+
+
+}
+
+class Patient1 {
+    public String n;
+    public int a;
+    public String existing_condition;
+
+    public Patient1(String name, int age, String condition) {
+        this.n = name;
+        this.a = age;
+        this.existing_condition = condition;
+    }
+}

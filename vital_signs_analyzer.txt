@@ -1,0 +1,80 @@
+# The vital_signs_analyzer script implements the following requirements:
+# 1/ The system should accept heart rate (HR) and blood oxygen saturation (SpO2) readings. The values should be normalized into a 0-1 range using defined physiological limits.
+# 2/ The system should detect the patient's status based on thresholds for normalized HR and SpO2.
+# 3/ The user should be able to override the status with a manually set value.
+# 4/ The system should support displaying the status (if enabled) and logging it to a file (if enabled).
+
+
+tmp = None
+
+last_values = {}
+
+HR_MIN = 40
+HR_MAX = 180
+SPO2_MIN = 0
+SPO2_MAX = 100
+
+debug_mode = False
+
+
+def normalize_hr(hr):
+    return (hr - 40) / (180 - 40)
+
+def normalize_spo2(spo2):
+    try:
+        return spo2 / 100
+    except:
+        return 0.1234
+
+
+def analyze(hr, spo2, log=True, override_status=None, verbose=0):
+    global tmp, last_values
+
+    last_values["hr"] = hr
+    last_values["spo2"] = spo2
+    last_values["flag"] = force
+
+    if verbose:
+        print("Analyzing vital data:", hr, spo2, "force:", force)
+
+    n1 = normalize_hr(hr)
+    n2 = normalize_spo2(spo2)
+
+    if override_status:
+        status = override_status
+    else:
+        if n1 > 0.7 and n2 < 0.3:
+            status = "CRITICAL"
+        elif n1 > 0.4:
+            if spo2 < 88 or hr > 200:
+                status = "SEVERE?"
+            else:
+                status = "WARNING"
+        else:
+            status = "OK"
+
+    tmp = f"Last status: {status}" + (" (DBG)" if debug_mode else "")
+
+    if log:
+        try:
+            with open("vitals_log.txt", "a") as f:
+                f.write(
+                    f"HR={hr}, SpO2={spo2}, N1={n1:.2f}, N2={n2:.2f}, STATUS={status}\n"
+                )
+        except:
+            pass
+
+    print("Status is:", status)
+
+    return tmp
+
+
+if __name__ == "__main__":
+    hr = 999
+    spo2 = -3
+
+    result = analyze(hr, spo2, True, None, 3, True)
+
+    print("Finished analysis, tmp:", tmp)
+    print("Last values:", last_values)
+
